@@ -2,9 +2,10 @@
   "name": "vue-layer",
   "version": "1.0.0",
   "description": "基于layer的vue集成组件",
-  "main": "index.js",
+  "main": "dist/app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "./node_modules/.bin/webpack --config build/webpack.config.base.js"
   },
   "repository": {
     "type": "git",
@@ -19,5 +20,13 @@
   "bugs": {
     "url": "https://github.com/keep2zero/vue-layer/issues"
   },
-  "homepage": "https://github.com/keep2zero/vue-layer#readme"
+  "homepage": "https://github.com/keep2zero/vue-layer#readme",
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-env": "^1.6.1",
+    "style-loader": "^0.19.0",
+    "url-loader": "^0.6.2",
+    "webpack": "^3.10.0"
+  }
 }
