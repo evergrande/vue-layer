@@ -1,0 +1,23 @@
+{
+  "name": "vue-layer",
+  "version": "1.0.0",
+  "description": "基于layer的vue集成组件",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/keep2zero/vue-layer.git"
+  },
+  "keywords": [
+    "vue",
+    "layer"
+  ],
+  "author": "towaywu@gmail.com[will]",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/keep2zero/vue-layer/issues"
+  },
+  "homepage": "https://github.com/keep2zero/vue-layer#readme"
+}
