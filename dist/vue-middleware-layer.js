@@ -11359,9 +11359,9 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
   };
 
   /**
-  
+
     拓展模块，layui开始合并在一起
-  
+
    */
 
   var cache = layer.cache || {},

@@ -6,8 +6,10 @@ import Vue from 'vue';
 require('./layer/theme/default/layer.css')
 require('./datepicker/skin/jedate.css')
 
-export function VueMiddleLayer() {}
+function VueMiddleLayer() {}
   VueMiddleLayer.install = function(Vue, options) {
   Vue.prototype.$layer = layer;
   Vue.prototype.$datepicker = datepicker;
 }
+
+export default VueMiddleLayer;

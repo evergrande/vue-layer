@@ -1,8 +1,8 @@
 {
   "name": "vue-middleware-layer",
-  "version": "1.0.4",
-  "description": "基于layer的vue集成组件",
-  "main": "dist/vue-middleware-layer.js",
+  "version": "1.0.7",
+  "description": "基于vue的中间层, 集成组件",
+  "main": "src/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "./node_modules/.bin/webpack --config build/webpack.config.base.js"
@@ -13,7 +13,8 @@
   },
   "keywords": [
     "vue",
-    "layer"
+    "layer",
+    "jeDate"
   ],
   "author": "towaywu@gmail.com[will]",
   "license": "MIT",
