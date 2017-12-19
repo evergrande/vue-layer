@@ -1,194 +1,123 @@
-;(function($) {
+let Popup = {};
+;(function ( $, window, document, undefined ) {
+  'use strict';
 
-	if ( typeof Object.create !== 'function' ) {
-	    Object.create = function( obj ) {
-	        function F() {}
-	        F.prototype = obj;
-	        return new F();
-	    };
-	}
+  var old = $.fn.popover;
 
-	var Popup = {
+  var Popover = function(el, options) {
+    this.$el = $(el);
+    this.options  = this.getOptions(options);
+    this.$wrapper = this.$el.parents('.popover-wrapper').eq(0);
+    this.$body    = this.$wrapper.find('.popover-body');
+    this.listenEvents();
+    return this;
+  };
 
-		defaultOptions: {
-			content: "",	//left blank, must be set when new options passed through
-			position: "top",	//where the popup will show by default- top. Other options: right, bottom, or left
-			style: "",	//default no style, will revert to default colours. Other options: blue, red, green, custom
-			animation: "standard",	//Standard animation by default. Other options: flip, grow, bounce
-			event: "click",	//Default set to "click", can also be set to hover
-			hideOnClick: true,	//When true, clicking off the menu closes it. When false, only clicking on the menu closes it
-			zIndex: 100,	//Individual z-index can be set for each menu for layering if necessary
-			popItemClick: function(){}	//function to handle actions when clicking on popup menu icons
-		},
+  Popover.DEFAULTS = {
+    trigger: 'click' // click | hover
+  };
 
-		init: function(options, elem) {
-			var self = this;
-			self.elem = elem;
-			self.$elem = $(elem);
-			self.options = $.extend({}, Popup.defaultOptions, options);
-			self.popup = $('<div class="pop-cont" />')
-			.addClass('pop-' + self.options.position)
-			.addClass('popupTheme' + self.options.style)
-			.append('<div class="pop-items" />')
-			.appendTo('body').css("opacity", 0).hide();
+  Popover.prototype.getDefaults = function() {
+    return Popover.DEFAULTS;
+  };
 
-			self.initializePopUp();
-		},
+  Popover.prototype.getOptions = function (options) {
+    options = $.extend({}, this.getDefaults(), this.$el.data(), options);
+    return options;
+  };
 
-		initializePopUp: function() {
-			var self = this;
-			self.setContent();
-			self.setTriggers();
-		},
+  Popover.prototype.listenEvents = function (options) {
+    var this_ = this;
+    var $el = this.$el;
 
-		setContent: function() {
-			var self = this;
-			var location = self.popup.find(".pop-items");
-			var content;
-			if ((self.options.position == 'top') || (self.options.position == 'bottom')) {
-				content = $(self.options.content).find("a").addClass("pop-item");
-				location.html(content);
-				self.popup.find("i").first().addClass("leftBorder");
-				self.popup.find("i").last().addClass("rightBorder");
-			} else if ((self.options.position == 'left') || (self.options.position == 'right')) {
-				content = $(self.options.content).find("a").addClass("pop-item").addClass('item-side');
-				location.html(content);
-				self.popup.find("i").first().addClass("topBorder");
-				self.popup.find("i").last().addClass("bottomBorder");
-			}
+    // click outside to close modal
+    $(document).click(function(e) {
+      if ( !this.$wrapper.hasClass('open') ){
+        return;
+      }
 
-		//popItemClick callback****************************************
-			location.find('.pop-item').on('click', function(event) {
-				event.preventDefault();
-				self.options.popItemClick.call(this);
-			});
-		},
+      var shouldClose = (
+        !$.contains( this.$wrapper[0], e.target )
+        && this.$wrapper[0] !== e.target
+      )
 
-		setTriggers: function() {
-			var self = this;
+      if ( shouldClose ) {
+        this.close();
+      }
+    }.bind(this));
 
-			if (self.options.event == 'click') {
-				self.$elem.on('click', function(event) {
-					event.preventDefault();
-					if (self.$elem.hasClass('pressed')) {
-						self.hide();
-					} else {
-						self.show();
-					}
-				});
-			}
+    // click, hover, or focus based triggers
+    var trigger = this.options.trigger;
+    if ( trigger === 'click' ) {
+      $el.on('click', function(e) {
+        e.preventDefault();
+        this_.toggle();
+      });
+    } else if ( trigger === 'hover' ) {
+      $el.on('mouseenter', function(e) {
+        e.preventDefault();
+        this_.open();
+      });
+      $el.on('mouseleave', function(e) {
+        e.preventDefault();
+        this_.close();
+      });
+      $el.on('click', function(e) {
+        e.preventDefault();
+        this_.toggle();
+      });
+    } else if ( trigger === 'focus' ) {
 
-			if (self.options.event == 'hover') {
-				self.$elem.on('mouseenter', function(event) {
-					setTimeout(function() {
-                        self.show();
-                    }, 250);
-				});
+    }
 
-				$('.pop-cont').on('mouseleave', function(event) {
-					setTimeout(function() {
-                            self.hide();
-                        }, 500);
-				});
-			}
+    // Listen to close buttons
+    this.$wrapper.find('[data-toggle-role="close"]').on('click', function(e) {
+      e.preventDefault();
+      this_.close();
+    });
 
-			if (self.options.hideOnClick === true) {
-				$('html').on('click.popup', function(event) {
-					if (event.target != self.elem && self.$elem.has(event.target).length === 0 && 
-						self.popup.has(event.target).length === 0 && self.popup.is(":visible")) {
-						self.hide();
-					}
-				});
-			}
-		},
+    return this;
+  };
 
-		hide: function() {
-			var self = this;
-			var animation = {opacity: 0};
-			self.$elem.removeClass('pressed');
+  Popover.prototype.open = function() {
+    if (this.$wrapper) this.$wrapper.addClass('open');
+    return this;
+  };
 
-			switch (self.options.position) {
-				case'top': 
-					animation.top = '+=20';
-					break;
-				case 'left':
-					animation.left = '+=20';
-					break;
-				case 'right':
-					animation.left = '-=20';
-					break;
-				case 'bottom':
-					animation.top = '-=20';
-					break;
-			}
-			self.popup.animate(animation, 200, function() {
-				self.popup.hide();
-			});
-		},
+  Popover.prototype.close = function() {
+    if (this.$wrapper) this.$wrapper.removeClass('open');
+    return this;
+  };
 
-		show: function() {
-			var self = this;
-			self.$elem.addClass('pressed');
-			self.setPosition();
-			self.popup.show().css({opacity: 1}).addClass('animate-' + self.options.animation);
-		},
+  Popover.prototype.toggle = function() {
+    if (this.$wrapper) this.$wrapper.toggleClass('open');
+    return this;
+  };
 
-		setPosition: function() {
-			var self = this;
-			self.coords = self.$elem.offset();
-			var x = self.coords.left;
-			var y = self.coords.top;
-			var popWidth = self.popup.width();
-			var popHeight = self.popup.height();
-			var adjLeft = popWidth / 2;
-			var adjTop = popHeight / 2;
+  // PLUGIN DEFINITION
+  var Plugin = function( options ){
+    return this.each(function() {
+      var $this = $(this);
+      var data = $this.data('gb.popover');
 
-			self.testy = $('<div class="test" />').css({display: 'inline-block', margin: '0px', padding: '0px'})
-			.appendTo('body');
-			var measure = self.$elem.clone().css({padding: "0px", margin: "0px"});
-			var loc = self.testy;
-			loc.html(measure);
-			var textWidth = self.testy.width();
-			var textHeight = self.testy.height();
-			self.testy.remove();
+      if (!data) {
+        data = new Popover(this, options);
+        $this.data('gb.popover', data);
+      }
+    });
+  };
 
-			var adjMenuWidth = textWidth / 2;
-			var adjMenuHeight = textHeight / 2;
-			var up = y - (popHeight + 7);
-			var down = y + textHeight;
+  $.fn.popover             = Plugin;
+  $.fn.popover.Constructor = Popover;
+  Popup = function(el, options) {
+     return new Popover(el, options)
+  }
 
-			if (self.popup.hasClass('pop-top')){
-					self.popup.css({top: up + "px",
-					 left: (x - adjLeft + adjMenuWidth + 5) + "px",
-					 right: "auto", 'z-index': self.options.zIndex});
-			}
+  // NO CONFLICT
+  $.fn.popover.noConflict = function() {
+    $.fn.popover = old;
+    return this;
+  };
+})( jQuery, window, document );
 
-			if (self.popup.hasClass('pop-bottom')) {
-					self.popup.css({top: (down + 7) + "px",
-					 left: (x - adjLeft + adjMenuWidth + 5) + "px",
-					 right: "auto", 'z-index': self.options.zIndex});
-			}
-
-			if (self.popup.hasClass('pop-left')) {
-				self.popup.css({top: (y - adjTop + adjMenuHeight + 5) + "px",
-				 left: (x - popWidth - 2) + "px",
-				 right: "auto", 'z-index': self.options.zIndex});
-			}
-
-			if (self.popup.hasClass('pop-right')) {
-				self.popup.css({top: (y - adjTop + adjMenuHeight + 5) + "px",
-				 left: (x + textWidth + 12) + "px",
-				 right: "auto", 'z-index': self.options.zIndex});
-			}
-		}
-	};
-
-//************************************************************************************
-	$.fn.popup = function(options) {
-		return this.each(function() {
-			var popobject = Object.create(Popup);
-			popobject.init(options, this);
-		});
-	};
-
-}(jQuery));
+export default Popup;

@@ -1,7 +1,7 @@
 import jquery from "jquery";
 import layer from "./layer";
 import datepicker from "./datepicker/jquery.jedate";
-import popup from "./popup/popup-plugin";
+import popup from "./popup";
 import Vue from 'vue';
 
 require('./layer/theme/default/layer.css')
