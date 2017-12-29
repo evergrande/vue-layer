@@ -110,7 +110,11 @@ let Popup = {};
   $.fn.popover             = Plugin;
   $.fn.popover.Constructor = Popover;
   Popup = function(el, options) {
-     return new Popover(el, options)
+    const pops = []
+    $(el).each(function(){
+       pops.push(new Popover(this, options))
+    })
+    return pops;
   }
 
   // NO CONFLICT
